@@ -1,4 +1,4 @@
-package com.minehut.hub.commands;
+package com.minehut.hub.daemon.commands;
 
 import com.minehut.commons.common.chat.C;
 import com.minehut.commons.common.chat.F;

@@ -1,4 +1,4 @@
-package com.minehut.hub.commands;
+package com.minehut.hub.daemon;
 
 import com.minehut.daemon.Kingdom;
 import com.minehut.daemon.tools.mc.MCPlayer;
