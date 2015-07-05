@@ -37,56 +37,61 @@ public class CreateCommand extends Command {
             F.message(player, C.gray + "Example: " + C.aqua + "/create Minehut");
         }
 
-        MCPlayer mcPlayer = new MCPlayer(player.getName(), player.getUniqueId());
+        /* Expect lag, time to go async boys */
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                MCPlayer mcPlayer = new MCPlayer(player.getName(), player.getUniqueId());
 
-        /* Player already owns a kingdom */
-        if (this.daemonManager.daemonFactory.hasKingdom(mcPlayer)) {
-            List<Kingdom> kingdoms = this.daemonManager.getDaemonFactory().getPlayerKingdoms(mcPlayer);
+                 /* Player already owns a kingdom */
+                if (daemonManager.daemonFactory.hasKingdom(mcPlayer)) {
+                    List<Kingdom> kingdoms = daemonManager.getDaemonFactory().getPlayerKingdoms(mcPlayer);
 
-            if(kingdoms.size() == 1) {
-                F.message(player, "You already have a kingdom called " + C.green + kingdoms.get(0).getName());
-                F.message(player, "Join it with " + C.aqua + "/join " + kingdoms.get(0).getName());
-            } else {
-                F.message(player, "You already have the following kingdoms:");
-                int i = 1;
-                for (Kingdom kingdom : kingdoms) {
-                    F.message(player, C.gray + i + ". " + C.green + kingdom.getName());
-                }
-            }
-            return false;
-        }
-
-        /* Check if name is already in use */
-        //todo: check if name can be in use
-
-        /* Didn't specify mod type, default to bukkit */
-        if(args.size() == 1) {
-
-            StatusSampleList statusSampleList = this.daemonManager.getDaemonFactory().getStatusSampleList();
-            SampleKingdom sampleKingdom = statusSampleList.sampleList.get(0);
-
-            this.daemonManager.getDaemonFactory().createKingdom(mcPlayer, sampleKingdom, args.get(0));
-
-            F.message(player, "Give us a few moments while we assemble your free server...");
-
-
-            /* Kingdom will be created shortly after request is sent */
-            Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(Hub.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    Kingdom kingdom = daemonManager.getPlayerKingdom(mcPlayer);
-                    if (kingdom != null) {
-                        daemonManager.handleStartupMonitor(kingdom, player);
+                    if(kingdoms.size() == 1) {
+                        F.message(player, "You already have a kingdom called " + C.green + kingdoms.get(0).getName());
+                        F.message(player, "Join it with " + C.aqua + "/join " + kingdoms.get(0).getName());
                     } else {
-                        F.log("Kingdom was null after 5 second delay :(");
+                        F.message(player, "You already have the following kingdoms:");
+                        int i = 1;
+                        for (Kingdom kingdom : kingdoms) {
+                            F.message(player, C.gray + i + ". " + C.green + kingdom.getName());
+                        }
                     }
                 }
-            }, 20L * 5);
-        }
 
-        else if (args.size() == 2) {
-            //TODO: mod/alternative-sample-kingdom support
-        }
+                 /* Check if name is already in use */
+                //todo: check if name can be in use
+
+                /* Didn't specify mod type, default to bukkit */
+                if(args.size() == 1) {
+
+                    StatusSampleList statusSampleList = daemonManager.getDaemonFactory().getStatusSampleList();
+                    SampleKingdom sampleKingdom = statusSampleList.sampleList.get(0);
+
+                    daemonManager.getDaemonFactory().createKingdom(mcPlayer, sampleKingdom, args.get(0));
+
+                    F.message(player, "Give us a few moments while we assemble your free server...");
+
+
+                    /* Kingdom will be created shortly after request is sent */
+                    Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(Hub.getInstance(), new Runnable() {
+                        @Override
+                        public void run() {
+                            Kingdom kingdom = daemonManager.getPlayerKingdom(mcPlayer);
+                            if (kingdom != null) {
+                                daemonManager.handleStartupMonitor(kingdom, player);
+                            } else {
+                                F.log("Kingdom was null after 5 second delay :(");
+                            }
+                        }
+                    }, 20L * 5);
+                }
+
+                else if (args.size() == 2) {
+                    //TODO: mod/alternative-sample-kingdom support
+                }
+            }
+        });
 
         return false;
     }
