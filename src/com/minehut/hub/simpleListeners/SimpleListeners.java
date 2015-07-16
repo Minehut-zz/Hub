@@ -1,7 +1,7 @@
 package com.minehut.hub.simpleListeners;
 
-import com.minehut.commons.common.chat.C;
-import com.minehut.commons.common.player.PlayerUtil;
+import com.minehut.core.util.common.chat.C;
+import com.minehut.core.util.common.player.PlayerUtil;
 import com.minehut.core.Core;
 import com.minehut.core.connection.event.AsyncPlayerInfoInitiatedEvent;
 import com.minehut.core.player.PlayerInfo;
@@ -18,10 +18,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,7 +31,9 @@ public class SimpleListeners implements Listener {
     private Location spawn;
 
     public SimpleListeners(Hub hub) {
-        this.spawn = Bukkit.getServer().getWorlds().get(0).getSpawnLocation();
+        this.hub = hub;
+        this.spawn = new Location(Bukkit.getServer().getWorlds().get(0), -4.5, 75, -22.5);
+        this.spawn.setYaw(180);
 
         Bukkit.getServer().getPluginManager().registerEvents(this, hub);
     }
@@ -53,7 +52,7 @@ public class SimpleListeners implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         PlayerUtil.clearAll(event.getPlayer());
-        player.teleport(HubUtils.getSpawn());
+        player.teleport(this.spawn);
         player.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 90, 10, false, false));
 
         HubUtils.setupInventory(player, true);
@@ -79,6 +78,16 @@ public class SimpleListeners implements Listener {
 //				}
 //			}
 //		}, 20 * 1);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        event.setQuitMessage("");
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        event.setLeaveMessage("");
     }
 
     @EventHandler

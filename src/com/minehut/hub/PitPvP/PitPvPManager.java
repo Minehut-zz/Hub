@@ -1,8 +1,8 @@
 package com.minehut.hub.PitPvP;
 
-import com.minehut.commons.common.chat.C;
-import com.minehut.commons.common.player.PlayerUtil;
-import com.minehut.commons.common.sound.S;
+import com.minehut.core.util.common.chat.C;
+import com.minehut.core.util.common.player.PlayerUtil;
+import com.minehut.core.util.common.sound.S;
 import com.minehut.hub.Hub;
 import com.minehut.hub.HubUtils;
 import com.minehut.hub.damage.CustomDamageEvent;

@@ -1,12 +1,10 @@
 package com.minehut.hub.daemon.commands;
 
-import com.minehut.commons.common.chat.C;
-import com.minehut.commons.common.chat.F;
+import com.minehut.core.util.common.chat.C;
+import com.minehut.core.util.common.chat.F;
 import com.minehut.core.command.Command;
 import com.minehut.core.player.Rank;
 import com.minehut.daemon.Kingdom;
-import com.minehut.daemon.SampleKingdom;
-import com.minehut.daemon.protocol.status.out.StatusSampleList;
 import com.minehut.daemon.tools.mc.MCPlayer;
 import com.minehut.hub.Hub;
 import com.minehut.hub.daemon.DaemonManager;
@@ -55,8 +53,11 @@ public class CreateCommand extends Command {
                         int i = 1;
                         for (Kingdom kingdom : kingdoms) {
                             F.message(player, C.gray + i + ". " + C.green + kingdom.getName());
+                            i++;
                         }
                     }
+
+                    return;
                 }
 
                  /* Check if name is already in use */
@@ -65,26 +66,20 @@ public class CreateCommand extends Command {
                 /* Didn't specify mod type, default to bukkit */
                 if(args.size() == 1) {
 
-                    StatusSampleList statusSampleList = daemonManager.getDaemonFactory().getStatusSampleList();
-                    SampleKingdom sampleKingdom = statusSampleList.sampleList.get(0);
 
-                    daemonManager.getDaemonFactory().createKingdom(mcPlayer, sampleKingdom, args.get(0));
 
                     F.message(player, "Give us a few moments while we assemble your free server...");
 
+                    daemonManager.getDaemonFactory().createKingdom(mcPlayer, daemonManager.getDefaultSampleKingdom(), args.get(0));
 
-                    /* Kingdom will be created shortly after request is sent */
-                    Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(Hub.getInstance(), new Runnable() {
-                        @Override
-                        public void run() {
-                            Kingdom kingdom = daemonManager.getPlayerKingdom(mcPlayer);
-                            if (kingdom != null) {
-                                daemonManager.handleStartupMonitor(kingdom, player);
-                            } else {
-                                F.log("Kingdom was null after 5 second delay :(");
-                            }
-                        }
-                    }, 20L * 5);
+                    Kingdom kingdom = daemonManager.getPlayerKingdom(mcPlayer);
+                    if (kingdom != null) {
+                        F.log("Starting kingdom " + kingdom.getName());
+                        daemonManager.getDaemonFactory().startKingdom(kingdom);
+                        daemonManager.handleStartupMonitor(kingdom, player);
+                    } else {
+                        F.log("Kingdom was null after 5 second delay :(");
+                    }
                 }
 
                 else if (args.size() == 2) {

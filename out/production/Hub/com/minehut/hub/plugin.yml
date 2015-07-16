@@ -1,0 +1,5 @@
+name: Hub
+main: com.minehut.hub.Hub
+author: Minehut
+version: 1.0
+depends: [Core]

@@ -1,5 +1,8 @@
 package com.minehut.hub.daemon;
 
+import com.minehut.core.Core;
+import com.minehut.core.util.common.chat.C;
+import com.minehut.core.util.common.chat.F;
 import com.minehut.daemon.Kingdom;
 import com.minehut.daemon.tools.mc.MCPlayer;
 import com.minehut.hub.Hub;
@@ -27,7 +30,7 @@ public class StartupMonitor implements Listener {
 
     private int runnableID = -1;
 
-    private int previousPercentage;
+    private String previousPercentage;
 
 
     public StartupMonitor(DaemonManager daemonManager, Kingdom kingdom, Player player) {
@@ -37,7 +40,7 @@ public class StartupMonitor implements Listener {
         this.players = new ArrayList<>();
         this.players.add(player);
 
-        this.previousPercentage = -1;
+        this.previousPercentage = "";
 
         this.runnableID = monitorRunnable();
 
@@ -50,11 +53,27 @@ public class StartupMonitor implements Listener {
             public void run() {
                 if (players != null && !players.isEmpty()) {
 
-                    int percentage; //TODO: retrieve percentage
+                    String startup = daemonManager.getDaemonFactory().getStartup(kingdom);
 
-                    for (Player player : players) {
+                    if (startup.equalsIgnoreCase("100%")) {
+                        for (Player player : players) {
+                            F.log("DEBUG -> Kingdom Name: " + kingdom.getName());
+                            Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
+                        }
+                        destroy();
+                    } else if (startup.equalsIgnoreCase("offline")) {
+                        for (Player player : players) {
+                            F.message(player, C.yellow + kingdom.getName() + C.red + " went offline during startup.");
+                        }
+                        destroy();
+                    } else if (!previousPercentage.equalsIgnoreCase(startup)) {
+                        previousPercentage = startup;
 
+                        for (Player player : players) {
+                            F.message(player, kingdom.getName() + C.gray + " Startup Status: " + C.aqua + startup);
+                        }
                     }
+
                 } else {
                     destroy();
                 }
@@ -105,9 +124,5 @@ public class StartupMonitor implements Listener {
 
     public int getRunnableID() {
         return runnableID;
-    }
-
-    public int getPreviousPercentage() {
-        return previousPercentage;
     }
 }

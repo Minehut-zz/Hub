@@ -1,6 +1,6 @@
 package com.minehut.hub.damage;
 
-import com.minehut.commons.common.event.UtilEvent;
+import com.minehut.core.util.common.event.UtilEvent;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

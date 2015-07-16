@@ -7,8 +7,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="commons" level="project" />
     <orderEntry type="library" name="spigot" level="project" />
-    <orderEntry type="library" name="KingdomDaemon" level="project" />
+    <orderEntry type="library" name="core" level="project" />
+    <orderEntry type="library" name="daemon" level="project" />
+    <orderEntry type="library" name="kingdomhost" level="project" />
   </component>
 </module>

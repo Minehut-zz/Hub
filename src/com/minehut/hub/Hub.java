@@ -2,6 +2,8 @@ package com.minehut.hub;
 
 import com.minehut.hub.PitPvP.PitPvPManager;
 import com.minehut.hub.daemon.DaemonManager;
+import com.minehut.hub.daemon.commands.FlyCommand;
+import com.minehut.hub.daemon.commands.HelpCommand;
 import com.minehut.hub.damage.DamageManagerModule;
 import com.minehut.hub.simpleListeners.SimpleListeners;
 import org.bukkit.Bukkit;
@@ -14,26 +16,35 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Hub extends JavaPlugin {
     private static Hub hub;
+    private PitPvPManager pitPvPManager;
 
     @EventHandler
     public void onEnable() {
         this.hub = this;
 
         Bukkit.getServer().getWorlds().get(0).getSpawnLocation().setX(-4.5);
-        Bukkit.getServer().getWorlds().get(0).getSpawnLocation().setY(73);
+        Bukkit.getServer().getWorlds().get(0).getSpawnLocation().setY(75);
         Bukkit.getServer().getWorlds().get(0).getSpawnLocation().setZ(-22.5);
         Bukkit.getServer().getWorlds().get(0).getSpawnLocation().setYaw(180);
 
         new DamageManagerModule();
         new SimpleListeners(this);
-        new PitPvPManager();
+        this.pitPvPManager = new PitPvPManager();
+
+        /* Commands */
+        new FlyCommand(this);
+        new HelpCommand(this);
 
         /* Kingdoms Related */
-        new DaemonManager(this);
+//        new DaemonManager(this);
     }
 
     public static Hub getInstance() {
         return hub;
+    }
+
+    public PitPvPManager getPitPvPManager() {
+        return pitPvPManager;
     }
 
     public Location getSpawn() {

@@ -1,6 +1,6 @@
 package com.minehut.hub.damage;
 
-import com.minehut.commons.common.sound.S;
+import com.minehut.core.util.common.sound.S;
 import com.minehut.hub.Hub;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="KingdomDaemon">
+  <library name="core">
     <CLASSES>
-      <root url="jar://$USER_HOME$/minehut/output/KingdomDaemon.jar!/" />
+      <root url="jar://$USER_HOME$/minehut/output/core.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
