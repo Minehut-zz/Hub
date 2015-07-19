@@ -2,8 +2,7 @@ package com.minehut.hub;
 
 import com.minehut.hub.PitPvP.PitPvPManager;
 import com.minehut.hub.daemon.DaemonManager;
-import com.minehut.hub.daemon.commands.FlyCommand;
-import com.minehut.hub.daemon.commands.HelpCommand;
+import com.minehut.hub.daemon.commands.*;
 import com.minehut.hub.damage.DamageManagerModule;
 import com.minehut.hub.simpleListeners.SimpleListeners;
 import org.bukkit.Bukkit;
@@ -17,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Hub extends JavaPlugin {
     private static Hub hub;
     private PitPvPManager pitPvPManager;
+    public DaemonManager daemonManager;
 
     @EventHandler
     public void onEnable() {
@@ -36,7 +36,11 @@ public class Hub extends JavaPlugin {
         new HelpCommand(this);
 
         /* Kingdoms Related */
-//        new DaemonManager(this);
+        this.daemonManager = new DaemonManager(this);
+
+        new CreateCommand(this, this.daemonManager);
+        new JoinCommand(this, this.daemonManager);
+        new ShutdownCommand(this, this.daemonManager);
     }
 
     public static Hub getInstance() {
