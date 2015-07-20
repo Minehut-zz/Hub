@@ -9,11 +9,13 @@ import com.minehut.core.util.common.chat.F;
 import com.minehut.daemon.Kingdom;
 import com.minehut.hub.Hub;
 import com.minehut.hub.daemon.DaemonManager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by luke on 7/6/15.
@@ -36,24 +38,38 @@ public class JoinCommand extends Command {
             return true;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(Hub.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                Kingdom kingdom = daemonManager.daemonFactory.getKingdom(args.get(0));
-                if (kingdom == null) {
-                    F.message(player, args.get(0) + C.red + " is not a valid kingdom");
-                } else {
-                    String startup = daemonManager.daemonFactory.getStartup(kingdom);
-                    if (!startup.equalsIgnoreCase("offline")) {
-                        Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
-                    } else {
-                        daemonManager.daemonFactory.startKingdom(kingdom);
-                        daemonManager.handleStartupMonitor(kingdom, player);
-                    }
-                }
-            }
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(Hub.getInstance(), new JoinCommandRunnable(player.getUniqueId(), args.get(0)));
 
         return false;
     }
+    
+    public class JoinCommandRunnable implements Runnable {
+
+    	private UUID playerUUID;
+    	private String kingdomName;
+    	
+    	public JoinCommandRunnable(UUID playerUUID, String kingdomName) {
+    		this.playerUUID = playerUUID;
+    		this.kingdomName = kingdomName;
+    	}
+    	
+    	 @Override
+         public void run() {
+    		 Player player = Bukkit.getPlayer(this.playerUUID);
+             Kingdom kingdom = daemonManager.daemonFactory.getKingdom(this.kingdomName);
+             if (kingdom == null) {
+                 F.message(player, this.kingdomName + C.red + " is not a valid kingdom");
+             } else {
+                 String startup = daemonManager.daemonFactory.getStartup(kingdom);
+                 if (!startup.equalsIgnoreCase("offline")) {
+                     Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
+                 } else {
+                     daemonManager.daemonFactory.startKingdom(kingdom);
+                     daemonManager.handleStartupMonitor(kingdom, player);
+                 }
+             }
+         }
+    	
+    }
+    
 }

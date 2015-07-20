@@ -13,6 +13,7 @@ import com.minehut.hub.Hub;
 import com.minehut.hub.daemon.commands.CreateCommand;
 import com.minehut.hub.daemon.commands.JoinCommand;
 import com.minehut.hub.daemon.commands.ShutdownCommand;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by luke on 7/4/15.
@@ -39,9 +41,9 @@ public class DaemonManager implements Listener {
         this.startupMonitors = new ArrayList<>();
 
         /* Commands */
-        new CreateCommand(hub, this);
-        new JoinCommand(hub, this);
-        new ShutdownCommand(hub, this);
+        //new CreateCommand(hub, this);
+        //new JoinCommand(hub, this);
+       // new ShutdownCommand(hub, this);
     }
 
     public DaemonFactory getDaemonFactory() {
@@ -80,12 +82,7 @@ public class DaemonManager implements Listener {
             if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(this.ownedServersItem.getItemMeta().getDisplayName())) {
                 MCPlayer mcPlayer = new MCPlayer(event.getPlayer().getName(), event.getPlayer().getUniqueId());
                 if (this.daemonFactory.hasKingdom(mcPlayer)) {
-                    Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new Runnable() {
-                        @Override
-                        public void run() {
-                            messagePlayerKingdoms(event.getPlayer(), mcPlayer);
-                        }
-                    });
+                    Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new MessagePlayerKingdomsRunnable(event.getPlayer().getUniqueId()));
                 } else {
                     F.message(event.getPlayer(), "You do not have a Kingdom.");
                     F.message(event.getPlayer(), "Create one with " + C.aqua + "/create (name)");
@@ -94,22 +91,38 @@ public class DaemonManager implements Listener {
         }
     }
 
-    public void messagePlayerKingdoms(Player player, MCPlayer mcPlayer) {
+    public class MessagePlayerKingdomsRunnable implements Runnable { //My java was forcing me to make crap final, this avoids that and should work for both of us
 
-        List<Kingdom> kingdoms = this.daemonFactory.getPlayerKingdoms(mcPlayer);
+    	private UUID playerUUID;
+    	
+    	public MessagePlayerKingdomsRunnable(UUID uuid) {
+    		this.playerUUID = uuid;
+    	}
+    	
+		@Override
+		public void run() {
+			Player player = Bukkit.getPlayer(this.playerUUID);
+			messagePlayerKingdoms(player, new MCPlayer(player.getName(), player.getUniqueId()));
+		}
+		
+		public void messagePlayerKingdoms(Player player, MCPlayer mcPlayer) {
 
-        if(kingdoms.size() == 1) {
-            F.message(player, "You own the kingdom called " + C.green + kingdoms.get(0).getName());
-            F.message(player, "Join it with " + C.aqua + "/join " + kingdoms.get(0).getName());
-        } else {
-            F.message(player, "You own the following kingdoms:");
-            int i = 1;
-            for (Kingdom kingdom : kingdoms) {
-                F.message(player, C.gray + i + ". " + C.green + kingdom.getName());
-                i++;
-            }
-        }
+	        List<Kingdom> kingdoms = daemonFactory.getPlayerKingdoms(mcPlayer);
+
+	        if(kingdoms.size() == 1) {
+	            F.message(player, "You own the kingdom called " + C.green + kingdoms.get(0).getName());
+	            F.message(player, "Join it with " + C.aqua + "/join " + kingdoms.get(0).getName());
+	        } else {
+	            F.message(player, "You own the following kingdoms:");
+	            int i = 1;
+	            for (Kingdom kingdom : kingdoms) {
+	                F.message(player, C.gray + i + ". " + C.green + kingdom.getName());
+	                i++;
+	            }
+	        }
+	    }
     }
+    
 
     public SampleKingdom getDefaultSampleKingdom() {
         StatusSampleList statusSampleList = daemonFactory.getStatusSampleList();
