@@ -42,6 +42,7 @@ public class Hub extends JavaPlugin {
         new JoinCommand(this, this.daemonManager);
         new ShutdownCommand(this, this.daemonManager);
         new ResetCommand(this, this.daemonManager);
+        new RenameCommand(this, this.daemonManager);
     }
 
     public static Hub getInstance() {

@@ -65,8 +65,6 @@ public class ResetCommand extends Command {
             if (kingdom == null) {
                 F.message(player, this.kingdomName + C.red + " is not a valid kingdom");
             } else {
-            	
-            	
                 if (kingdom.getOwner().playerUUID.equalsIgnoreCase(player.getUniqueId().toString())) {
                 	kingdom.setSampleKingdom(daemonManager.getDaemonFactory().getSampleKingdom(sample));
                     daemonManager.getDaemonFactory().resetKingdom(kingdom);
@@ -74,8 +72,6 @@ public class ResetCommand extends Command {
                 } else {
                     F.message(player, "You do not have permission to reset " + C.aqua + kingdom.getName());
                 }
-                
-                
             }
         }
     	
