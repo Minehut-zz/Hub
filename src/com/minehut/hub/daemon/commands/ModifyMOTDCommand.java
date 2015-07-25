@@ -36,7 +36,7 @@ public class ModifyMOTDCommand extends Command {
         }
 
         //TODO: rename runnable
-        Bukkit.getScheduler().runTaskAsynchronously(Hub.getInstance(), new ModifyMOTDCommandRunnable(player.getUniqueId(), args.get(0), StringUtils.join(args.subList(1, args.size()-1), " ")));
+        Bukkit.getScheduler().runTaskAsynchronously(Hub.getInstance(), new ModifyMOTDCommandRunnable(player.getUniqueId(), args.get(0), StringUtils.join(args.subList(1, args.size()), " ")));
         return false;
     }
     
@@ -67,7 +67,7 @@ public class ModifyMOTDCommand extends Command {
             			motdOut = replaceColors(motdOut);
             		}
                 	F.message(player, "Changing kingdom motd to " + C.aqua + motdOut);
-                	daemonManager.daemonFactory.setKingdomMOTD(this.kingdomName, motdOut);
+                	daemonManager.daemonFactory.setKingdomMOTD(kingdom, motdOut);
                 } else {
                 	//TODO: Check if player is staff for mod or admin use
                     F.message(player, "You do not have permission to set motd for " + C.aqua + kingdom.getName());
