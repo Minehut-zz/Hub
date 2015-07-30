@@ -80,7 +80,7 @@ public class DaemonManager implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (EventUtils.isItemClickWithDisplayName(event)) {
             if (event.getItem().getItemMeta().getDisplayName().equalsIgnoreCase(this.ownedServersItem.getItemMeta().getDisplayName())) {
-                MCPlayer mcPlayer = new MCPlayer(event.getPlayer().getName(), event.getPlayer().getUniqueId());
+                MCPlayer mcPlayer = new MCPlayer(event.getPlayer().getUniqueId());
                 if (this.daemonFactory.hasKingdom(mcPlayer)) {
                     Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new MessagePlayerKingdomsRunnable(event.getPlayer().getUniqueId()));
                 } else {
@@ -102,7 +102,7 @@ public class DaemonManager implements Listener {
 		@Override
 		public void run() {
 			Player player = Bukkit.getPlayer(this.playerUUID);
-			messagePlayerKingdoms(player, new MCPlayer(player.getName(), player.getUniqueId()));
+			messagePlayerKingdoms(player, new MCPlayer(player.getUniqueId()));
 		}
 		
 		public void messagePlayerKingdoms(Player player, MCPlayer mcPlayer) {

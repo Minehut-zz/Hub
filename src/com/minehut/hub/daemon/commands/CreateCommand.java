@@ -70,7 +70,7 @@ public class CreateCommand extends Command {
 				System.out.println("NULL PLAYER OBJECT FOUND");
 				return;
 			}
-            MCPlayer mcPlayer = new MCPlayer(player.getName(), player.getUniqueId());
+            MCPlayer mcPlayer = new MCPlayer(player.getUniqueId());
 
             System.out.println("Checking if player has a kingdom");
              /* Player already owns a kingdom */
