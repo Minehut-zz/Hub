@@ -32,6 +32,7 @@ public class ResetCommand extends Command {
         if (args == null || args.isEmpty()) {
             F.warning(player, "Please specify a name!");
             F.warning(player, C.gray + "Example: " + C.aqua + "/reset Minehut");
+            return true;
         }
 
         Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new ResetCommandRunnable(player, args, player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType()));

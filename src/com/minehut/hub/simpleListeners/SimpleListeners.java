@@ -8,6 +8,7 @@ import com.minehut.core.player.PlayerInfo;
 import com.minehut.core.player.Rank;
 import com.minehut.hub.Hub;
 import com.minehut.hub.HubUtils;
+import com.minehut.hub.simpleListeners.command.BuildCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,9 +43,14 @@ public class SimpleListeners implements Listener {
         this.spawn = new Location(Bukkit.getServer().getWorlds().get(0), -4.5, 75, -13.5);
         this.spawn.setYaw(180);
 
-
+        this.builders = new ArrayList<>();
+        new BuildCommand(hub, this);
 
         Bukkit.getServer().getPluginManager().registerEvents(this, hub);
+    }
+
+    public boolean canBuild(Player player) {
+        return this.builders.contains(player);
     }
 
     @EventHandler
@@ -99,11 +105,19 @@ public class SimpleListeners implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         event.setQuitMessage("");
+
+        if (this.builders.contains(event.getPlayer())) {
+            this.builders.remove(event.getPlayer());
+        }
     }
 
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
         event.setLeaveMessage("");
+
+        if (this.builders.contains(event.getPlayer())) {
+            this.builders.remove(event.getPlayer());
+        }
     }
 
     @EventHandler
@@ -124,7 +138,11 @@ public class SimpleListeners implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
+
+        if(this.canBuild(event.getPlayer())) return;
+
         PlayerInfo playerInfo = Core.getInstance().getPlayerInfo(event.getPlayer());
+
         if (!playerInfo.getRank().has(null, Rank.Admin, false)) {
             event.setCancelled(true);
         }
@@ -132,6 +150,9 @@ public class SimpleListeners implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
+
+        if(this.canBuild(event.getPlayer())) return;
+
         PlayerInfo playerInfo = Core.getInstance().getPlayerInfo(event.getPlayer());
         if (!playerInfo.getRank().has(null, Rank.Admin, false)) {
             event.setCancelled(true);
@@ -141,12 +162,16 @@ public class SimpleListeners implements Listener {
 
     @EventHandler
     public void onMoveInventory(InventoryMoveItemEvent event) {
+
         event.setCancelled(true);
     }
 
     @EventHandler
     public void hangingBreak(HangingBreakByEntityEvent event) {
         if (event.getRemover() instanceof Player) {
+
+            if(this.canBuild((Player) event.getRemover())) return;
+
             PlayerInfo playerInfo = Core.getInstance().getPlayerInfo((Player) event.getRemover());
             if (playerInfo.getRank().has(null, Rank.Admin, false)) {
                 return;
