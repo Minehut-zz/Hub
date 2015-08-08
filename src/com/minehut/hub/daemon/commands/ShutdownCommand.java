@@ -66,7 +66,7 @@ public class ShutdownCommand extends Command {
                         daemonManager.getDaemonFactory().stopKingdom(kingdom.getName());
                         F.message(player, C.aqua + kingdom.getName() + C.yellow + " was shutdown");
                     } else {
-                        F.message(player, C.aqua + kingdom.getName() + C.yellow + "is already offline!");
+                        F.message(player, C.aqua + kingdom.getName() + C.yellow + " is already offline!");
                     }
                 } else {
                     F.message(player, "You do not have permission to shutdown " + C.aqua + kingdom.getName());

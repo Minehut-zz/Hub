@@ -26,7 +26,11 @@ public class HelpCommand extends Command {
         F.message(player, "/create (name)");
         F.message(player, "/join (name)");
         F.message(player, "/reset");
-        S.click(player);
+        F.message(player, "/set-motd (motd)");
+        F.message(player, "/shutdown (name)");
+        F.message(player, "/rename (old-name) (new-name)");
+
+        S.pop(player);
 
         return false;
     }

@@ -29,21 +29,20 @@ public class ResetCommand extends Command {
     @Override
     public boolean call(Player player, ArrayList<String> args) {
         /* Make sure they specify a name */
-        if (args == null) {
-            F.message(player, "Please specify a name!");
-            F.message(player, C.gray + "Example: " + C.aqua + "/reset Minehut");
+        if (args == null || args.isEmpty()) {
+            F.warning(player, "Please specify a name!");
+            F.warning(player, C.gray + "Example: " + C.aqua + "/reset Minehut");
         }
-        
-        if (args.size() == 1) {
-        	Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new ResetCommandRunnable(player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType()));
-        } else
-        if (args.size() == 2) {
-        	if (this.daemonManager.getDaemonFactory().isSampleKingdom(args.get(1))) {
-        		Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new ResetCommandRunnable(player.getUniqueId(), args.get(0), args.get(1)));
-        	} else {
-        		F.message(player, "That is not a proper Kingdom type!");
-        	}
-        }
+
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new ResetCommandRunnable(player, args, player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType()));
+
+//        else if (args.size() == 2) {
+//        	if (this.daemonManager.getDaemonFactory().isSampleKingdom(args.get(1))) {
+//        		Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new ResetCommandRunnable(player.getUniqueId(), args.get(0), args.get(1)));
+//        	} else {
+//        		F.warning(player, "That is not a proper Kingdom type!");
+//        	}
+//        }
         return false;
     }
     
@@ -51,28 +50,40 @@ public class ResetCommand extends Command {
 
     	private UUID playerUUID;
     	private String kingdomName, sample;
+        private ArrayList<String> args;
+        private Player player;
     	
-    	public ResetCommandRunnable(UUID uuid, String kingdomName, String sample) {
+    	public ResetCommandRunnable(Player player, ArrayList<String> args, UUID uuid, String kingdomName, String sample) {
     		this.playerUUID = uuid;
     		this.kingdomName = kingdomName;
     		this.sample = sample;
+            this.player = player;
+            this.args = args;
     	}
     	
 		@Override
         public void run() {
-			Player player = Bukkit.getPlayer(this.playerUUID);
-            Kingdom kingdom = daemonManager.daemonFactory.getKingdom(this.kingdomName);
-            if (kingdom == null) {
-                F.message(player, this.kingdomName + C.red + " is not a valid kingdom");
-            } else {
-                if (kingdom.getOwner().playerUUID.equalsIgnoreCase(player.getUniqueId().toString())) {
-                	kingdom.setSampleKingdom(daemonManager.getDaemonFactory().getSampleKingdom(sample));
-                    daemonManager.getDaemonFactory().resetKingdom(kingdom);
-                    F.message(player, "Your kingdom has been reset!");
+
+
+            if (args.size() == 1) {
+                Player player = Bukkit.getPlayer(this.playerUUID);
+                Kingdom kingdom = daemonManager.daemonFactory.getKingdom(this.kingdomName);
+                if (kingdom == null) {
+                    F.warning(player, this.kingdomName + C.red + " is not a valid kingdom");
                 } else {
-                    F.message(player, "You do not have permission to reset " + C.aqua + kingdom.getName());
+                    if (kingdom.getOwner().playerUUID.equalsIgnoreCase(player.getUniqueId().toString())) {
+                        kingdom.setSampleKingdom(daemonManager.getDaemonFactory().getSampleKingdom(sample));
+                        daemonManager.getDaemonFactory().resetKingdom(kingdom);
+                        F.message(player, "Your kingdom has been reset!");
+                    } else {
+                        F.message(player, "You do not have permission to reset " + C.aqua + kingdom.getName());
+                    }
                 }
+            } else {
+                F.warning(player, "Please specify which kingdom to reset");
+                F.warning(player, "Example: " + C.green + "/reset Minehut");
             }
+
         }
     	
     }

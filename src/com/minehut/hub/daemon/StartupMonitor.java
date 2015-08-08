@@ -40,11 +40,13 @@ public class StartupMonitor implements Listener {
         this.players = new ArrayList<>();
         this.players.add(player);
 
+        F.message(player, "Starting up your kingdom...", F.BroadcastType.MINIMAL_BORDER);
+
         this.previousPercentage = "";
 
         this.runnableID = monitorRunnable();
 
-        Bukkit.getServer().getPluginManager().registerEvents(this, Hub.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(this, Hub.instance);
     }
 
     private int monitorRunnable() {
@@ -57,20 +59,26 @@ public class StartupMonitor implements Listener {
 
                     if (startup.equalsIgnoreCase("100%")) {
                         for (Player player : players) {
-                            F.log("DEBUG -> Kingdom Name: " + kingdom.getName());
-                            Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
+                            if(player != null) {
+                                F.log("DEBUG -> Kingdom Name: " + kingdom.getName());
+                                Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
+                            }
                         }
                         destroy();
                     } else if (startup.equalsIgnoreCase("offline")) {
                         for (Player player : players) {
-                            F.message(player, C.yellow + kingdom.getName() + C.red + " went offline during startup.");
+                            if(player != null) {
+                                F.message(player, C.yellow + kingdom.getName() + C.red + " went offline during startup.");
+                            }
                         }
                         destroy();
                     } else if (!previousPercentage.equalsIgnoreCase(startup)) {
                         previousPercentage = startup;
 
                         for (Player player : players) {
-                            F.message(player, kingdom.getName() + C.gray + " Startup Status: " + C.aqua + startup);
+                            if(player != null) {
+                                F.message(player, kingdom.getName() + C.gray + " Startup Status: " + C.aqua + startup);
+                            }
                         }
                     }
 
@@ -86,10 +94,13 @@ public class StartupMonitor implements Listener {
             Bukkit.getServer().getScheduler().cancelTask(this.runnableID);
         }
         HandlerList.unregisterAll(this);
+        daemonManager.removeStartupMonitor(this);
     }
 
     public void addPlayer(Player player) {
         this.players.add(player);
+
+        F.message(player, "Starting up your kingdom...", F.BroadcastType.MINIMAL_BORDER);
     }
 
     public boolean containsPlayer(Player player) {

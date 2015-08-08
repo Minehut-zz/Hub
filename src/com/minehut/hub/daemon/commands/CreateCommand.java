@@ -35,41 +35,53 @@ public class CreateCommand extends Command {
             F.message(player, "Please specify a name!");
             F.message(player, C.gray + "Example: " + C.aqua + "/create Minehut");
         }
-        /* Expect lag, time to go async boys
-         * Moved to it's own class to clean things up
-         * and my jdk was freaking saying it needed final vars */
-        if (args.size() == 1) {
-        	Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new CreateCommandRunnable(player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType()));
-        } else
-        if (args.size() == 2) {
-        	if (this.daemonManager.getDaemonFactory().isSampleKingdom(args.get(1))) {
-        		Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new CreateCommandRunnable(player.getUniqueId(), args.get(0), args.get(1)));
-        	} else {
-        		F.message(player, "That is not a proper Kingdom type!");
-        	}
-        }
+
+        Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.instance, new CreateRunnable(player, args));
+
         return false;
     }
-    
-    public class CreateCommandRunnable implements Runnable {
 
-    	private UUID playerUUID;
-    	private String kingdomName, sample;
-    	
-    	public CreateCommandRunnable(UUID uuid, String kingdomName, String sample) {
-    		System.out.println("CreateCommandRunnable created playerUUID=" + uuid + ",kingdomName=" + kingdomName +",sample=" + sample);
-    		this.playerUUID = uuid;
-    		this.kingdomName = kingdomName;
-    		this.sample = sample;
-    	}
-    	
-		@Override
+    public class CreateRunnable implements Runnable {
+
+        public ArrayList<String> args;
+        public Player player;
+
+        public CreateRunnable(Player player, ArrayList<String> args) {
+            this.player = player;
+            this.args = args;
+        }
+
+        @Override
         public void run() {
-			Player player = Bukkit.getPlayer(this.playerUUID);
-			if (player == null) {
-				System.out.println("NULL PLAYER OBJECT FOUND");
-				return;
-			}
+            if (args.size() == 1) {
+//                Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new CreateCommandRunnable(player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType()));
+
+                create(player.getUniqueId(), args.get(0), daemonManager.getDefaultSampleKingdom().getType());
+
+            } else
+            if (args.size() == 2) {
+                if (daemonManager.getDaemonFactory().isSampleKingdom(args.get(1))) {
+//                    Bukkit.getServer().getScheduler().runTaskAsynchronously(Hub.getInstance(), new CreateCommandRunnable(player.getUniqueId(), args.get(0), args.get(1)));
+
+                    create(player.getUniqueId(), args.get(0), args.get(1));
+                } else {
+                    F.warning(player, "That is not a proper Kingdom type!");
+                }
+            } else {
+                F.warning(player, "Please specify a one-word name!");
+                F.warning(player, "Example: " + C.green + "/create Minehut");
+            }
+        }
+
+        public void create(UUID playerUUID, String kingdomName, String sample) {
+            System.out.println("CreateCommandRunnable created playerUUID=" + playerUUID + ",kingdomName=" + kingdomName +",sample=" + sample);
+
+
+            Player player = Bukkit.getPlayer(playerUUID);
+            if (player == null) {
+                System.out.println("NULL PLAYER OBJECT FOUND");
+                return;
+            }
             MCPlayer mcPlayer = new MCPlayer(player.getUniqueId());
 
             System.out.println("Checking if player has a kingdom");
@@ -94,29 +106,53 @@ public class CreateCommand extends Command {
             System.out.println("Checking if kingdom name is in use");
              /* Check if name is already in use */
             //todo: check if name can be in use
-            if (daemonManager.getDaemonFactory().isKingdom(this.kingdomName)) {
-            	F.message(player, "There is already a Kingdom with that name!");
-            	return;
+            if (daemonManager.getDaemonFactory().isKingdom(kingdomName)) {
+                F.message(player, "There is already a Kingdom with that name!");
+                return;
             }
-            
+
             System.out.println("Checking if sample text is not null and not blank");
             /* Didn't specify mod type, default to bukkit */
-            if(this.sample!=null||this.sample.equals("")) {
+            if( sample!=null|| sample.equals("")) {
                 F.message(player, "Give us a few moments while we assemble your free server...");
 
-                daemonManager.getDaemonFactory().createKingdom(mcPlayer, daemonManager.getDaemonFactory().getSampleKingdom(this.sample), this.kingdomName);
+                daemonManager.getDaemonFactory().createKingdom(mcPlayer, daemonManager.getDaemonFactory().getSampleKingdom(sample), kingdomName);
 
                 Kingdom kingdom = daemonManager.getPlayerKingdom(mcPlayer);
                 if (kingdom != null) {
                     F.log("Starting kingdom " + kingdom.getName());
-                    daemonManager.getDaemonFactory().startKingdom(kingdom);
-                    daemonManager.handleStartupMonitor(kingdom, player);
+                    if(daemonManager.getDaemonFactory().startKingdom(kingdom)) {
+                        daemonManager.checkForStartupMonitor(kingdom, player);
+                    } else {
+                        F.warning(player, "Your kingdom was " + C.green + "created" + C.gray + ", but was not started because our servers are currently full.");
+                        F.warning(player, "Once someone leaves their server, you will be able to join yours.");
+                    }
                 } else {
                     F.log("Kingdom was null after 5 second delay :(");
                 }
             }
         }
-    	
+        }
     }
+
+
     
-}
+//    public class CreateCommandRunnable implements Runnable {
+//
+//    	private UUID playerUUID;
+//    	private String kingdomName, sample;
+//
+//    	public CreateCommandRunnable(UUID uuid, String kingdomName, String sample) {
+//    		System.out.println("CreateCommandRunnable created playerUUID=" + uuid + ",kingdomName=" + kingdomName +",sample=" + sample);
+//    		this.playerUUID = uuid;
+//    		this.kingdomName = kingdomName;
+//    		this.sample = sample;
+//    	}
+//
+//		@Override
+//        public void run() {
+//
+//
+//    }
+    
+//}

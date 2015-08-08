@@ -19,6 +19,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +37,7 @@ public class DaemonManager implements Listener {
 
     public DaemonManager(Hub hub) {
         this.ownedServersItem = getOwnedServersItem();
-        this.daemonFactory = new DaemonFactory("localhost", 10420);
+        this.daemonFactory = new DaemonFactory("mc.minehut.com", 10420);
 
         this.startupMonitors = new ArrayList<>();
 
@@ -50,19 +51,25 @@ public class DaemonManager implements Listener {
         return daemonFactory;
     }
 
-    public void handleStartupMonitor(Kingdom kingdom, Player player) {
+
+    public boolean checkForStartupMonitor(Kingdom kingdom, Player player) {
 
         /* Check to see if kingdom is already being monitored */
         for (StartupMonitor startupMonitor : this.startupMonitors) {
-            if (startupMonitor.getKingdom() == kingdom) {
+            if (startupMonitor.getKingdom().getName().equals(kingdom.getName())) {
                 if (!startupMonitor.containsPlayer(player)) {
                     startupMonitor.addPlayer(player);
-                    return;
                 }
+                return true;
             }
         }
 
-        /* Server isn't being monitored, start monitoring now */
+        return false;
+    }
+
+    public void addStartupMonitor(Kingdom kingdom, Player player) {
+        F.log("CREATING NEW STARTUP MONITOR! Player: " + player.getName() + " Kingdom: " + kingdom.getName());
+
         this.startupMonitors.add(new StartupMonitor(this, kingdom, player));
     }
 
@@ -74,6 +81,21 @@ public class DaemonManager implements Listener {
         }
 
         return null;
+    }
+
+    public void removeStartupMonitor(StartupMonitor startupMonitor) {
+        StartupMonitor toRemove = null;
+
+        for (StartupMonitor startupMonitor1 : this.startupMonitors) {
+            if (startupMonitor.kingdom.getName().equals(startupMonitor1.kingdom.getName())) {
+                toRemove = startupMonitor1;
+            }
+        }
+
+        if (toRemove != null) {
+            int index = this.startupMonitors.indexOf(toRemove);
+            this.startupMonitors.remove(index);
+        }
     }
 
     @EventHandler

@@ -10,9 +10,11 @@ import com.minehut.hub.Hub;
 import com.minehut.hub.HubUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -23,19 +25,32 @@ import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+
 /**
  * Created by luke on 7/2/15.
  */
 public class SimpleListeners implements Listener {
+
+    public ArrayList<Player> builders;
+
     private Hub hub;
-    private Location spawn;
+    public Location spawn;
 
     public SimpleListeners(Hub hub) {
         this.hub = hub;
-        this.spawn = new Location(Bukkit.getServer().getWorlds().get(0), -4.5, 75, -22.5);
+        this.spawn = new Location(Bukkit.getServer().getWorlds().get(0), -4.5, 75, -13.5);
         this.spawn.setYaw(180);
 
+
+
         Bukkit.getServer().getPluginManager().registerEvents(this, hub);
+    }
+
+    @EventHandler
+    public void noUproot(PlayerInteractEvent event) {
+        if(event.getAction() == Action.PHYSICAL && event.getClickedBlock().getType() == Material.SOIL)
+            event.setCancelled(true);
     }
 
     @EventHandler
@@ -61,8 +76,9 @@ public class SimpleListeners implements Listener {
 
         player.sendMessage(C.divider);
         player.sendMessage("");
-        player.sendMessage(C.space + "Welcome to the " + C.aqua + C.bold + "MINEHUT NETWORK" + C.white + "!");
-        player.sendMessage(C.space + "Create a server with " + C.aqua + "/create (name)");
+        player.sendMessage(C.space + "Welcome to the " + C.purple + C.bold + "MINEHUT NETWORK");
+        player.sendMessage(C.space + "Create a server with " + C.green + "/create (name)");
+        player.sendMessage(C.space + "For additional commands, type " + C.green + "/help");
         player.sendMessage("");
         player.sendMessage(C.divider);
 
@@ -163,11 +179,17 @@ public class SimpleListeners implements Listener {
                     + " » "
                     + C.yellow + "%2$s");
         }
-        else {
+        else if(playerInfo.getRank().has(null, Rank.Mega, false)) {
             event.setFormat(playerInfo.getRank().getTag()
                     + event.getPlayer().getName()
                     + " » "
                     + C.white + "%2$s");
+        }
+        else {
+            event.setFormat(playerInfo.getRank().getTag()
+                    + event.getPlayer().getName()
+                    + " » "
+                    + C.gray + "%2$s");
         }
     }
 

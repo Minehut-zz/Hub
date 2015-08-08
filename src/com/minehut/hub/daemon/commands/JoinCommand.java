@@ -3,7 +3,6 @@ package com.minehut.hub.daemon.commands;
 import com.minehut.core.Core;
 import com.minehut.core.command.Command;
 import com.minehut.core.player.Rank;
-import com.minehut.core.util.common.bungee.Bungee;
 import com.minehut.core.util.common.chat.C;
 import com.minehut.core.util.common.chat.F;
 import com.minehut.daemon.Kingdom;
@@ -58,14 +57,23 @@ public class JoinCommand extends Command {
     		 Player player = Bukkit.getPlayer(this.playerUUID);
              Kingdom kingdom = daemonManager.daemonFactory.getKingdom(this.kingdomName);
              if (kingdom == null) {
-                 F.message(player, this.kingdomName + C.red + " is not a valid kingdom");
+                 F.warning(player, C.red + this.kingdomName + C.gray + " is not a valid kingdom");
+                 F.warning(player, "You can see what kingdom you own with " + C.purple + "/mykingdom");
              } else {
                  String startup = daemonManager.daemonFactory.getStartup(kingdom);
-                 if (!startup.equalsIgnoreCase("offline")) {
+                 if (startup.equalsIgnoreCase("100%")) {
                      Core.getInstance().getStatusManager().sendToKingdom(player, kingdom.getName());
                  } else {
-                     daemonManager.daemonFactory.startKingdom(kingdom);
-                     daemonManager.handleStartupMonitor(kingdom, player);
+//                     F.log("Startup Return: " + startup);
+                     if (!daemonManager.checkForStartupMonitor(kingdom, player)) {
+                         if(daemonManager.daemonFactory.startKingdom(kingdom)) {
+                             daemonManager.addStartupMonitor(kingdom, player);
+                         } else {
+                             F.warning(player, "Kingdom Servers are currently maxed out!");
+                             F.warning(player, "Once someone leaves their server, you will be able to join yours.");
+                         }
+                     }
+
                  }
              }
          }

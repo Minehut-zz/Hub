@@ -116,7 +116,7 @@ public class PitPvPManager implements Listener {
 
     @EventHandler
     public void onRespawn(CustomRespawnEvent event) {
-        event.setSpawn(Hub.getInstance().getSpawn());
+        event.setSpawn(Hub.instance.simpleListeners.spawn);
     }
 
     public boolean isInsidePit(Location location) {
