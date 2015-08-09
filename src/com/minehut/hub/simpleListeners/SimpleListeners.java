@@ -122,6 +122,9 @@ public class SimpleListeners implements Listener {
 
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event) {
+
+        if(this.canBuild(event.getPlayer())) return;
+
         if (!Core.getInstance().getPlayerInfo(event.getPlayer()).getRank().has(null, Rank.Admin, false)) {
             event.setCancelled(true);
             event.getPlayer().updateInventory();

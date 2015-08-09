@@ -1,4 +1,4 @@
-package com.minehut.hub.PitPvP;
+package com.minehut.hub.miniplugins.PitPvP;
 
 import com.minehut.core.util.common.chat.C;
 import com.minehut.core.util.common.player.PlayerUtil;

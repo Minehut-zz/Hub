@@ -1,13 +1,14 @@
 package com.minehut.hub;
 
-import com.minehut.hub.PitPvP.PitPvPManager;
+import com.minehut.hub.miniplugins.Archery.ArcheryManager;
+import com.minehut.hub.miniplugins.Archery.command.ArcheryCommand;
+import com.minehut.hub.miniplugins.PitPvP.PitPvPManager;
 import com.minehut.hub.daemon.DaemonManager;
 import com.minehut.hub.daemon.commands.*;
 import com.minehut.hub.damage.DamageManagerModule;
 import com.minehut.hub.npc.NPCManager;
 import com.minehut.hub.simpleListeners.SimpleListeners;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +22,7 @@ public class Hub extends JavaPlugin {
     public DaemonManager daemonManager;
     public SimpleListeners simpleListeners;
     public NPCManager npcManager;
+    public ArcheryManager archeryManager;
 
     @EventHandler
     public void onEnable() {
@@ -39,6 +41,7 @@ public class Hub extends JavaPlugin {
         this.simpleListeners = new SimpleListeners(this);
         this.pitPvPManager = new PitPvPManager();
         this.npcManager = new NPCManager(Bukkit.getServer().getWorlds().get(0));
+        this.archeryManager = new ArcheryManager();
 
         /* Commands */
         new FlyCommand(this);
